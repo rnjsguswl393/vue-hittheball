@@ -1,14 +1,14 @@
 <template>
-  <div class="home">
+  <div class="home" style="overflow-y:hidden; ">
     <br>
     <p>{{title}}</p>
-    <div class="row" style="margin:0 auto; " >
-      <router-link class="card" to="/services"   >
-        <div style="float:left">
+    <div class="row" style="margin:0 auto;   display:inline-flex">
+      <router-link class="card" to="/services" style="margin-right:5px"  >
+        <div style="float:left;  ">
           <img src="../assets/images/golf1.png" class="card-img-top"  >
         </div>
-      </router-link>
-      <router-link class="card" to="/blog">
+      </router-link> 
+      <router-link class="card" to="/blog" style="margin-left:5px">
           <div style="float:right">
             <img src="../assets/images/golf2.png" class="card-img-top"  >
           </div>
@@ -21,20 +21,21 @@
     </div>
      <br>
     <p>{{subtitle}}</p>
-    <div class="next" style="margin:0 auto">
-      <div class="card" style="width: 10rem; float:left" v-for="(data,index) in products" :key="index">
+    <div style="flex-wrap:nowrap; overflow-x:scroll; overflow-y:hidden">
+    <div class="next" style="margin:0 auto; display:inline-flex " >
+      <div class="card" style="width: 10rem; float:left; " v-for="(data,index) in products" :key="index">
           <img :src="data.image" class="card-img-top" @click="goTodetail(data.productId)">
-          <div class="card-body">
-            <h5 class="card-title">{{data.productTitle}}</h5>
-            <p class="card-text">
+          <div class="card-body" style="float:left">
+            <h5 class="card-title"  style="text-align:center;">{{data.productTitle}}</h5>
+            <p class="card-text" style="text-align:center;" >
               현재위치에서 약 {{data.productId}}km
             </p>
           </div>
-        </div>
+      </div>
       <!-- <router-link class="nav-link" to="/blog"> -->
       
     </div>
-    
+    </div>
   </div>
 
 </template>
@@ -69,16 +70,16 @@ export default {
         image       : require('../assets/images/product4.png'),
         productId:4
       },
-      // {
-      //   productTitle:"MLI",
-      //   image       : require('../assets/images/product5.png'),
-      //   productId:5
-      // },
-      // {
-      //   productTitle:"Banans",
-      //   image       : require('../assets/images/product6.png'),
-      //   productId:6
-      // }
+      {
+        productTitle:"MLI",
+        image       : require('../assets/images/product5.png'),
+        productId:5
+      },
+      {
+        productTitle:"Banans",
+        image       : require('../assets/images/product6.png'),
+        productId:6
+      }
       ]
     }
   },

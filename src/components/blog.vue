@@ -51,74 +51,39 @@
       </tr>
     </table>
 	<div id="app"></div>
-	  
-	<!-- <div>
-      <vue-horizontal-list :items="items" :options="{responsive: [{end: 576, size: 1}, {size: 2}]}">
-        <template v-slot:default="{item}">
-          <div class="bg-steam border-3 overflow-hidden flex">
-            <div class="ImageBoxed">
-              <img :src="item.image"/>
-            </div>
 
-            <div class="p-16-24">
-              <h5 class="text-ellipsis-1l">{{item.title}}</h5>
-              <p class="text-ellipsis-2l">{{item.content}}</p>
-            </div>
-          </div>
-        </template>
-      </vue-horizontal-list>
+    <!-- <div class="vhl-container" :style="_style.container">
+      <div class="vhl-list" ref="list" :class="_options.list.class" :style="_style.list">
+        <div v-for="item in items" ref="item" class="vhl-item" :class="_options.item.class" :style="_style.item">
+          <slot v-bind:item="item">{{item}}</slot>
+        </div>
+
+        <div :style="_style.tail">
+        </div>
+      </div>
     </div> -->
+  <a href="http://localhost:8080/#/details/1"> <p>여기에 div추가</p></a>
   </div>
-	<!-- <div class="blog">
-		<h1>{{title}}</h1>
-		<div class="row">
-			<div class="col-md-4">
-				<div class="card">
-					<div class="card-header">
-						<h3>Vus.js</h3>
-					</div>
-					<div class="card-body">
-						
-						cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-						proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="card">
-					<div class="card-header">
-						<h3>Angular</h3>
-					</div>
-					<div class="card-body">
-						
-						cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-						proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="card">
-					<div class="card-header">
-						<h3>React</h3>
-					</div>
-					<div class="card-body">
-						
-						cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-						proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> -->
+	
 </template>
 <script>
-
+  import golf from '../assets/data/골프장.json'
   import VueDaumMap from './VueDaumMap.vue';
   import config from './config';
 
   export default {
     name: 'App',
     components: {VueDaumMap},
+    // props:{
+    //   items: {
+    //     type: Array,
+    //     required: true
+    //   },
+    //   options: {
+    //     type: Object,
+    //     required: false
+    //   }
+    // },
     data: () => ({
       appKey: config.appKey,
       center: {lat:37.523291, lng:127.0545508},
@@ -141,18 +106,66 @@
 		this.mapObject = map;
 		
         //마커마커마컼마컼ㅋ
-        var marker=new kakao.maps.Marker({
-		position: map.getCenter(), 
-		clickable:true,
-        map: map
-	  	});
-	  	var iwContent = '<div style="padding:5px;"><a href="http://localhost:8080/#/details/1" target="_blank"><strong>골프존파크</strong></a></div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-			iwRemoveable = true;
-		var infowindow = new kakao.maps.InfoWindow({
-    		content : iwContent,
-    		removable : iwRemoveable
-		});
+    //   var marker=new kakao.maps.Marker({
+		//     position: map.getCenter(), 
+		//     clickable:true,
+    //     map: map
+	  // 	});
+	  // 	var iwContent = '<div style="padding:5px;"><a href="http://localhost:8080/#/details/1" target="_blank"><strong>골프존파크</strong></a></div>', // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+		// 	iwRemoveable = true;
+		//   var infowindow = new kakao.maps.InfoWindow({
+    // 		content : iwContent,
+    // 		removable : iwRemoveable
+		// });
+    var positions = [
+    {
+        content: '<div>카카오</div>', 
+        latlng: new kakao.maps.LatLng(33.450705, 126.570677)
+    },
+    {
+        content: '<div>생태연못</div>', 
+        latlng: new kakao.maps.LatLng(33.450936, 126.569477)
+    },
+    {
+        content: '<div>텃밭</div>', 
+        latlng: new kakao.maps.LatLng(33.450879, 126.569940)
+    },
+    {
+        content: '<div>근린공원</div>',
+        latlng: new kakao.maps.LatLng(33.451393, 126.570738)
+    }
+];
+    for (var i = 0; i < positions.length; i ++) {
+    // 마커를 생성합니다
+    var marker = new kakao.maps.Marker({
+        map: map, // 마커를 표시할 지도
+        position: positions[i].latlng // 마커의 위치
+    });
 
+    // 마커에 표시할 인포윈도우를 생성합니다 
+    var infowindow = new kakao.maps.InfoWindow({
+        content: positions[i].content // 인포윈도우에 표시할 내용
+    });
+
+    // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+    // 이벤트 리스너로는 클로저를 만들어 등록합니다 
+    // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+    kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+    }
+    // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
+function makeOverListener(map, marker, infowindow) {
+    return function() {
+        infowindow.open(map, marker);
+    };
+}
+
+// 인포윈도우를 닫는 클로저를 만드는 함수입니다 
+function makeOutListener(infowindow) {
+    return function() {
+        infowindow.close();
+    };
+}
 		function test(){
 			console.log("test");
 		}
