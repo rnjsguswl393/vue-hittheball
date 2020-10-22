@@ -2,7 +2,7 @@
   <div>
     <h1>카카오 지도</h1>
 
-    <vue-daum-map 
+    <vue-daum-map
 
       :appKey="appKey"
 
@@ -64,7 +64,7 @@
     </div> -->
   <a href="http://localhost:8080/#/details/1"> <p>여기에 div추가</p></a>
   </div>
-	
+
 </template>
 <script>
   import golf from '../assets/data/연습장.json'
@@ -87,7 +87,7 @@
     data: () => ({
       appKey: config.appKey,
       center: {lat:37.523291, lng:127.0545508},
-      level: 3,
+      level: 12,
       mapTypeId: VueDaumMap.MapTypeId.NORMAL,
       libraries: ["services","clusterer","drawing"],
       mapObject: null,
@@ -104,10 +104,10 @@
         console.log('Daum Map Loaded', boundsStr);
 
 		this.mapObject = map;
-		
+
         //마커마커마컼마컼ㅋ
     //   var marker=new kakao.maps.Marker({
-		//     position: map.getCenter(), 
+		//     position: map.getCenter(),
 		//     clickable:true,
     //     map: map
 	  // 	});
@@ -121,23 +121,23 @@
     // console.log(Object.values(golf));
     var content=new Array;
     golf.golfplace.forEach((item)=>{
-      positions.push(new kakao.maps.LatLng(item.latitude,item.longitude));
-      content.push(item.name);
+      if(item.latitude || item.longitude){
+        positions.push(new kakao.maps.LatLng(item.latitude,item.longitude));
+        content.push(item.name);
+      }
     });
-    console.log(positions);
 
-    console.log(content);
 //     var positions = [
 //     {
-//         content: '<div>카카오</div>', 
+//         content: '<div>카카오</div>',
 //         latlng: new kakao.maps.LatLng(33.450705, 126.570677)
 //     },
 //     {
-//         content: '<div>생태연못</div>', 
+//         content: '<div>생태연못</div>',
 //         latlng: new kakao.maps.LatLng(33.450936, 126.569477)
 //     },
 //     {
-//         content: '<div>텃밭</div>', 
+//         content: '<div>텃밭</div>',
 //         latlng: new kakao.maps.LatLng(33.450879, 126.569940)
 //     },
 //     {
@@ -145,72 +145,88 @@
 //         latlng: new kakao.maps.LatLng(33.451393, 126.570738)
 //     }
 // ];
-var clusterer = new kakao.maps.MarkerClusterer({
-        map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체 
-        averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정 
-        minLevel: 10 // 클러스터 할 최소 지도 레벨 
-    });
-    for (var i = 0; i < positions.length; i ++) {
-    // 마커를 생성합니다
-    var markers = new kakao.maps.Marker({
-        map: map, // 마커를 표시할 지도
-        position: positions[i] // 마커의 위치
-    });
-    clusterer.addMarkers(markers);
-    // 마커에 표시할 인포윈도우를 생성합니다 
-    var infowindow = new kakao.maps.InfoWindow({
-        content: content[i] // 인포윈도우에 표시할 내용
+    var clusterer = new kakao.maps.MarkerClusterer({
+        map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
+        averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
+        minLevel: 5 // 클러스터 할 최소 지도 레벨
     });
 
-    // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
-    // 이벤트 리스너로는 클로저를 만들어 등록합니다 
-    // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
-    kakao.maps.event.addListener(markers, 'mouseover', makeOverListener(map, markers, infowindow));
-    kakao.maps.event.addListener(markers, 'mouseout', makeOutListener(infowindow));
+    var cMarkers = positions.map(function(value, index){
+      // 마커 클러스터러로 관리할 마커 객체는 생성할 때 지도 객체를 설정하지 않습니다
+      return new kakao.maps.Marker({
+        position : new kakao.maps.LatLng(value.getLat(), value.getLng())
+      })
+    })
+    clusterer.addMarkers(cMarkers)
+
+    // for (var i = 0; i < positions.length; i ++) {
+    // // 마커를 생성합니다
+    //   var markers = new kakao.maps.Marker({
+    //       map: map, // 마커를 표시할 지도
+    //       position: positions[i] // 마커의 위치
+    //   });
+    //   // 마커에 표시할 인포윈도우를 생성합니다
+    //   var infowindow = new kakao.maps.InfoWindow({
+    //       content: content[i] // 인포윈도우에 표시할 내용
+    //   });
+
+    //   // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+    //   // 이벤트 리스너로는 클로저를 만들어 등록합니다
+    //   // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+    //   kakao.maps.event.addListener(markers, 'mouseover', makeOverListener(map, markers, infowindow));
+    //   kakao.maps.event.addListener(markers, 'mouseout', makeOutListener(infowindow));
+
+    //   // var cMarkers = new kakao.maps.Marker({
+    //   //     //position: positions[i] // 마커의 위치
+    //   //     position : new kakao.maps.LatLng(positions[i].getLat(), positions[i].getLng())
+    //   // });
+
+    //   // clusterer.addMarkers(cMarkers);
+    // }
+
+    // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
+    function makeOverListener(map, markers, infowindow) {
+        return function() {
+            infowindow.open(map, markers);
+        };
     }
-    // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
-function makeOverListener(map, markers, infowindow) {
-    return function() {
-        infowindow.open(map, markers);
-    };
-}
 
-// 인포윈도우를 닫는 클로저를 만드는 함수입니다 
-function makeOutListener(infowindow) {
-    return function() {
-        infowindow.close();
-    };
-}
+    // 인포윈도우를 닫는 클로저를 만드는 함수입니다
+    function makeOutListener(infowindow) {
+        return function() {
+            infowindow.close();
+        };
+    }
 
-		kakao.maps.event.addListener(markers, 'click', function() {
-      // 마커 위에 인포윈도우를 표시합니다
-			infowindow.open(map, markers);  	  
-		});
-  
+		// kakao.maps.event.addListener(markers, 'click', function() {
+    //   // 마커 위에 인포윈도우를 표시합니다
+		// 	infowindow.open(map, markers);
+		// });
+
 
 
 		//현재위치마커마커
 		if (navigator.geolocation) {
-    
+
     // GeoLocation을 이용해서 접속 위치를 얻어옵니다
     		navigator.geolocation.getCurrentPosition(function(position) {
-        
+
        	 		var lat = position.coords.latitude, // 위도
             		lon = position.coords.longitude; // 경도
-        
+
         		var locPosition = new kakao.maps.LatLng(lat, lon), // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
             		message = '<div style="padding:5px;">현재위치입니다</div>'; // 인포윈도우에 표시될 내용입니다
-        
+
         // 마커와 인포윈도우를 표시합니다
         		displayMarker(locPosition, message);
-				
+
       		});
-    
+
 	} else { // HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
-    
-    	var locPosition = new kakao.maps.LatLng(37.523291,127.0545508),    
+
+    	var locPosition = new kakao.maps.LatLng(37.523291,127.0545508),
         	message = 'geolocation을 사용할수 없어요..'
-        
+
     	displayMarker(locPosition, message);
 	}
 
@@ -218,11 +234,11 @@ function makeOutListener(infowindow) {
 	function displayMarker(locPosition, message) {
 
     // 마커를 생성합니다
-    	var marker = new kakao.maps.Marker({  
-        	map: map, 
+    	var marker = new kakao.maps.Marker({
+        	map: map,
         	position: locPosition
-    	}); 
-    
+    	});
+
     	var iwContent = message, // 인포윈도우에 표시할 내용
         	iwRemoveable = true;
 
@@ -231,19 +247,19 @@ function makeOutListener(infowindow) {
        		content : iwContent,
         	removable : iwRemoveable
     	});
-    
-    // 인포윈도우를 마커위에 표시합니다 
+
+    // 인포윈도우를 마커위에 표시합니다
     	infowindow.open(map, marker);
-    
+
     // 지도 중심좌표를 접속위치로 변경합니다
-    	map.setCenter(locPosition);      
-    } 
-    
+    	map.setCenter(locPosition);
+    }
+
 	},
-	  
+
       onMapEvent (event, params) {
-        console.log(`Daum Map Event(${event})`, params);
-        
+        //console.log(`Daum Map Event(${event})`, params);
+
       }
     }
   }
@@ -254,10 +270,10 @@ function makeOutListener(infowindow) {
 	// 			title:'Blog'
 	// 		}
 	// 	},
-		
+
 	// }
 </script>
 
 <style scoped>
-	
+
 </style>
