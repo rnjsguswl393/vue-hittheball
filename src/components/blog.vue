@@ -67,7 +67,7 @@
 	
 </template>
 <script>
-  import golf from '../assets/data/골프장.json'
+  import golf from '../assets/data/연습장.json'
   import VueDaumMap from './VueDaumMap.vue';
   import config from './config';
 
@@ -116,47 +116,62 @@
 		//   var infowindow = new kakao.maps.InfoWindow({
     // 		content : iwContent,
     // 		removable : iwRemoveable
-		// });
-    var positions = [
-    {
-        content: '<div>카카오</div>', 
-        latlng: new kakao.maps.LatLng(33.450705, 126.570677)
-    },
-    {
-        content: '<div>생태연못</div>', 
-        latlng: new kakao.maps.LatLng(33.450936, 126.569477)
-    },
-    {
-        content: '<div>텃밭</div>', 
-        latlng: new kakao.maps.LatLng(33.450879, 126.569940)
-    },
-    {
-        content: '<div>근린공원</div>',
-        latlng: new kakao.maps.LatLng(33.451393, 126.570738)
-    }
-];
+    // });
+    var positions=new Array;
+    // console.log(Object.values(golf));
+    var content=new Array;
+    golf.golfplace.forEach((item)=>{
+      positions.push(new kakao.maps.LatLng(item.latitude,item.longitude));
+      content.push(item.name);
+    });
+    console.log(positions);
+
+    console.log(content);
+//     var positions = [
+//     {
+//         content: '<div>카카오</div>', 
+//         latlng: new kakao.maps.LatLng(33.450705, 126.570677)
+//     },
+//     {
+//         content: '<div>생태연못</div>', 
+//         latlng: new kakao.maps.LatLng(33.450936, 126.569477)
+//     },
+//     {
+//         content: '<div>텃밭</div>', 
+//         latlng: new kakao.maps.LatLng(33.450879, 126.569940)
+//     },
+//     {
+//         content: '<div>근린공원</div>',
+//         latlng: new kakao.maps.LatLng(33.451393, 126.570738)
+//     }
+// ];
+var clusterer = new kakao.maps.MarkerClusterer({
+        map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체 
+        averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정 
+        minLevel: 10 // 클러스터 할 최소 지도 레벨 
+    });
     for (var i = 0; i < positions.length; i ++) {
     // 마커를 생성합니다
-    var marker = new kakao.maps.Marker({
+    var markers = new kakao.maps.Marker({
         map: map, // 마커를 표시할 지도
-        position: positions[i].latlng // 마커의 위치
+        position: positions[i] // 마커의 위치
     });
-
+    clusterer.addMarkers(markers);
     // 마커에 표시할 인포윈도우를 생성합니다 
     var infowindow = new kakao.maps.InfoWindow({
-        content: positions[i].content // 인포윈도우에 표시할 내용
+        content: content[i] // 인포윈도우에 표시할 내용
     });
 
     // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
     // 이벤트 리스너로는 클로저를 만들어 등록합니다 
     // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
-    kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
-    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+    kakao.maps.event.addListener(markers, 'mouseover', makeOverListener(map, markers, infowindow));
+    kakao.maps.event.addListener(markers, 'mouseout', makeOutListener(infowindow));
     }
     // 인포윈도우를 표시하는 클로저를 만드는 함수입니다 
-function makeOverListener(map, marker, infowindow) {
+function makeOverListener(map, markers, infowindow) {
     return function() {
-        infowindow.open(map, marker);
+        infowindow.open(map, markers);
     };
 }
 
@@ -166,14 +181,13 @@ function makeOutListener(infowindow) {
         infowindow.close();
     };
 }
-		function test(){
-			console.log("test");
-		}
 
-		kakao.maps.event.addListener(marker, 'click', function() {
+		kakao.maps.event.addListener(markers, 'click', function() {
       // 마커 위에 인포윈도우를 표시합니다
-			infowindow.open(map, marker);  	  
+			infowindow.open(map, markers);  	  
 		});
+  
+
 
 		//현재위치마커마커
 		if (navigator.geolocation) {
@@ -223,11 +237,13 @@ function makeOutListener(infowindow) {
     
     // 지도 중심좌표를 접속위치로 변경합니다
     	map.setCenter(locPosition);      
-		}    
+    } 
+    
 	},
 	  
       onMapEvent (event, params) {
         console.log(`Daum Map Event(${event})`, params);
+        
       }
     }
   }
